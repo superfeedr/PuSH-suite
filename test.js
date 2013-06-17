@@ -8,6 +8,8 @@ subscriber = require('./subscriber.js');
 
 // https://superfeedr-misc.s3.amazonaws.com/pubsubhubbub-core-0.4.html
 
+var hostname =  process.env.HOSTNAME || '0.0.0.0';
+
 if(! process.env.HUB_URL) {
   console.log('Please setup an environment HUB_URL var.');
   process.exit('1')
@@ -19,8 +21,8 @@ describe('PubSubHubbub', function () {
 
   before(function(done) {
     var ready = _.after(2, done);
-    publisher.listen(3001, ready);
-    subscriber.listen(3002, ready);
+    publisher.listen(3001, hostname, ready);
+    subscriber.listen(3002, hostname, ready);
   });
 
   describe('discovery', function() {
