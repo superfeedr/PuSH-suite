@@ -30,212 +30,212 @@ describe('PubSubHubbub', function () {
     subscriber.listen(subscriber.port, ready);
   });
 
-  // describe('discovery', function() {
-  //   describe('the publisher', function() {
-  //     var resource;
-  //     before(function(done) {
-  //       request(publisher).get('/resource').expect(200, function(err, res) {
-  //         resource = res;
-  //         done();
-  //       });
-  //     })
+  describe('discovery', function() {
+    describe('the publisher', function() {
+      var resource;
+      before(function(done) {
+        request(publisher).get('/resource').expect(200, function(err, res) {
+          resource = res;
+          done();
+        });
+      })
 
-  //     it('should serve the resources with a link header pointing to a self url', function() {
-  //       assert(resource.links.self);
-  //     });
-  //     it('should serve the resources with a link header pointing to the right hub', function() {
-  //       assert.equal(resource.links.hub, publisher.hub);
-  //     });
-  //   });
-  // });
+      it('should serve the resources with a link header pointing to a self url', function() {
+        assert(resource.links.self);
+      });
+      it('should serve the resources with a link header pointing to the right hub', function() {
+        assert.equal(resource.links.hub, publisher.hub);
+      });
+    });
+  });
 
-  // describe('subscribing', function() {
-  //   var resource, callback;
+  describe('subscribing', function() {
+    var resource, callback;
 
-  //   before(function(done) {
-  //     request(publisher).get('/resource?hub=' + publisher.hub).expect(200, function(err, res) {
-  //       resource = res;
-  //       request(subscriber).get('/callback').expect(200, function(err, res) {
-  //         callback = res
-  //         done();
-  //       });
-  //     });
-  //   })
+    before(function(done) {
+      request(publisher).get('/resource?hub=' + publisher.hub).expect(200, function(err, res) {
+        resource = res;
+        request(subscriber).get('/callback').expect(200, function(err, res) {
+          callback = res
+          done();
+        });
+      });
+    })
 
-  //   it('should return a 202 when issuing a valid subscription request', function(done) {
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.mode=subscribe').
-  //     send('hub.topic=' + resource.links.self).
-  //     send('hub.callback=' + callback.links.self).
-  //     expect(202, done);
-  //   });
+    it('should return a 202 when issuing a valid subscription request', function(done) {
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=subscribe').
+      send('hub.topic=' + resource.links.self).
+      send('hub.callback=' + callback.links.self).
+      expect(202, done);
+    });
 
-  //   it('should accept http callback urls', function(done) {
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.mode=subscribe').
-  //     send('hub.topic=' + resource.links.self).
-  //     send('hub.callback=' + callback.links.self).
-  //     expect(202, done);
-  //   });
+    it('should accept http callback urls', function(done) {
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=subscribe').
+      send('hub.topic=' + resource.links.self).
+      send('hub.callback=' + callback.links.self).
+      expect(202, done);
+    });
 
-  //   it('should accept https callback urls', function(done) {
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.mode=subscribe').
-  //     send('hub.topic=' + resource.links.self).
-  //     send('hub.callback=' + callback.links.self.replace('http', 'https')).
-  //     expect(202, done);
-  //   });
+    it('should accept https callback urls', function(done) {
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=subscribe').
+      send('hub.topic=' + resource.links.self).
+      send('hub.callback=' + callback.links.self.replace('http', 'https')).
+      expect(202, done);
+    });
 
-  //   it('should accept callback urls with extra string parameters', function(done) {
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.mode=subscribe').
-  //     send('hub.topic=' + resource.links.self).
-  //     send('hub.callback=' + callback.links.self + '?param=extra').
-  //     expect(202, done);
-  //   });
+    it('should accept callback urls with extra string parameters', function(done) {
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=subscribe').
+      send('hub.topic=' + resource.links.self).
+      send('hub.callback=' + callback.links.self + '?param=extra').
+      expect(202, done);
+    });
 
-  //   it('should accept only the self link provided by the discovery phase, if there is any', function(done) {
-  //     var parsed = urlParser.parse(resource.links.self);
-  //     parsed.hash = 'hello'
-  //     var r = urlParser.format(parsed);
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.mode=subscribe').
-  //     send('hub.topic=' + r).
-  //     send('hub.callback=' + callback.links.self).
-  //     expect(422, done);
-  //   });
+    it('should accept only the self link provided by the discovery phase, if there is any', function(done) {
+      var parsed = urlParser.parse(resource.links.self);
+      parsed.hash = 'hello'
+      var r = urlParser.format(parsed);
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=subscribe').
+      send('hub.topic=' + r).
+      send('hub.callback=' + callback.links.self).
+      expect(422, done);
+    });
 
-  //   it('should return a 4xx when issuing a invalid subscription request with no hub.callback and provide the right error in the body', function(done) {
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.mode=subscribe').
-  //     send('hub.topic=' + resource.links.self).
-  //     expect(422, /hub\.callback/, done);
-  //   });
+    it('should return a 4xx when issuing a invalid subscription request with no hub.callback and provide the right error in the body', function(done) {
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=subscribe').
+      send('hub.topic=' + resource.links.self).
+      expect(422, /hub\.callback/, done);
+    });
 
-  //   it('should return a 4xx when issuing a invalid subscription request with no hub.mode and provide the right error in the body', function(done) {
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.topic=' + resource.links.self).
-  //     send('hub.callback=' + callback.links.self).
-  //     expect(422, /hub\.mode/, done);
-  //   });
+    it('should return a 4xx when issuing a invalid subscription request with no hub.mode and provide the right error in the body', function(done) {
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.topic=' + resource.links.self).
+      send('hub.callback=' + callback.links.self).
+      expect(422, /hub\.mode/, done);
+    });
 
-  //   it('should return a 4xx when issuing a invalid subscription request with no hub.topic and provide the right error in the body', function(done) {
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.mode=subscribe').
-  //     send('hub.callback=' + callback.links.self).
-  //     expect(422, /hub\.topic/, done);
-  //   });
+    it('should return a 4xx when issuing a invalid subscription request with no hub.topic and provide the right error in the body', function(done) {
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=subscribe').
+      send('hub.callback=' + callback.links.self).
+      expect(422, /hub\.topic/, done);
+    });
 
-  //   it('should ignore extra parameters they do not understand', function(done) {
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.mode=subscribe').
-  //     send('hub.topic=' + resource.links.self).
-  //     send('hub.callback=' + callback.links.self).
-  //     send('another=param').
-  //     expect(202, done);
-  //   });
+    it('should ignore extra parameters they do not understand', function(done) {
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=subscribe').
+      send('hub.topic=' + resource.links.self).
+      send('hub.callback=' + callback.links.self).
+      send('another=param').
+      expect(202, done);
+    });
 
-  //   it('should accept re-subscriptions', function(done) {
-  //     request(publisher.hub).
-  //     post('/').
-  //     type('form').
-  //     send('hub.mode=subscribe').
-  //     send('hub.topic=' + resource.links.self).
-  //     send('hub.callback=' + callback.links.self).
-  //     expect(202, function() {
-  //       request(publisher.hub).
-  //       post('/').
-  //       type('form').
-  //       send('hub.mode=subscribe').
-  //       send('hub.topic=' + resource.links.self).
-  //       send('hub.callback=' + callback.links.self).
-  //       expect(202, done);
-  //     });
-  //   });
+    it('should accept re-subscriptions', function(done) {
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=subscribe').
+      send('hub.topic=' + resource.links.self).
+      send('hub.callback=' + callback.links.self).
+      expect(202, function() {
+        request(publisher.hub).
+        post('/').
+        type('form').
+        send('hub.mode=subscribe').
+        send('hub.topic=' + resource.links.self).
+        send('hub.callback=' + callback.links.self).
+        expect(202, done);
+      });
+    });
 
-  //   describe('subscription validation', function() {
-  //     var denied;
-  //     before(function(done) {
-  //       this.timeout(longTimeout);
-  //       subscriber.denied = function(request) {
-  //         denied = request;
-  //         done();
-  //       }
-  //       request(publisher.hub).
-  //       post('/').
-  //       type('form').
-  //       send('hub.mode=subscribe').
-  //       send('hub.topic=' + encodeURIComponent(resource.links.self)).
-  //       send('hub.callback=' + encodeURIComponent(callback.links.self + '?publisher=denied')).
-  //       expect(202, function(err, res) {
+    describe('subscription validation', function() {
+      var denied;
+      before(function(done) {
+        this.timeout(longTimeout);
+        subscriber.denied = function(request) {
+          denied = request;
+          done();
+        }
+        request(publisher.hub).
+        post('/').
+        type('form').
+        send('hub.mode=subscribe').
+        send('hub.topic=' + encodeURIComponent(resource.links.self)).
+        send('hub.callback=' + encodeURIComponent(callback.links.self + '?publisher=denied')).
+        expect(202, function(err, res) {
 
-  //       });
+        });
 
-  //     })
-  //     it('should inform the subscriber when the subscription has been denied by the publisher', function() {
-  //       assert.equal(denied.query['hub.mode'], "denied");
-  //     });
+      })
+      it('should inform the subscriber when the subscription has been denied by the publisher', function() {
+        assert.equal(denied.query['hub.mode'], "denied");
+      });
 
-  //     it('should inform the subscriber when the subscription has been denied by the publisher with the right hub.topic', function() {
-  //       assert.equal(denied.query['hub.topic'], resource.links.self);
-  //     });
-  //   });
+      it('should inform the subscriber when the subscription has been denied by the publisher with the right hub.topic', function() {
+        assert.equal(denied.query['hub.topic'], resource.links.self);
+      });
+    });
 
-  //   describe('hub verifies intent of the subscriber', function() {
-  //     describe('verification details', function() {
+    describe('hub verifies intent of the subscriber', function() {
+      describe('verification details', function() {
 
-  //       before(function(done) {
-  //         this.timeout(longTimeout);
-  //           subscriber.verified = function(request) {
-  //             verification = request;
-  //             done();
-  //           }
-  //             request(publisher.hub).
-  //             post('/').
-  //             type('form').
-  //             send('hub.mode=subscribe').
-  //             send('hub.topic=' + encodeURIComponent(resource.links.self)).
-  //             send('hub.callback=' + encodeURIComponent(callback.links.self)).
-  //             expect(202, function(err, res) {
-  //               // We need to wait!
-  //             });
-  //       })
-  //       it('should verify the intent of the subscriber when the publisher has accepted the subscription', function() {
-  //         assert(verification);
-  //       });
-  //       it('should include the hub.mode', function() {
-  //         assert.equal(verification.query['hub.mode'], "subscribe");
-  //       });
-  //       it('should include the hub.topic', function() {
-  //         assert.equal(verification.query['hub.topic'], resource.links.self);
-  //       });
-  //       it('should include a hub.challenge', function() {
-  //         assert(verification.query['hub.challenge']);
-  //       });
-  //       it('should include the hub.lease_seconds', function() {
-  //         assert.equal(parseInt(verification.query['hub.lease_seconds']).toString(), verification.query['hub.lease_seconds']);
-  //       });
-  //     });
-  //   });
-  // });
+        before(function(done) {
+          this.timeout(longTimeout);
+            subscriber.verified = function(request) {
+              verification = request;
+              done();
+            }
+              request(publisher.hub).
+              post('/').
+              type('form').
+              send('hub.mode=subscribe').
+              send('hub.topic=' + encodeURIComponent(resource.links.self)).
+              send('hub.callback=' + encodeURIComponent(callback.links.self)).
+              expect(202, function(err, res) {
+                // We need to wait!
+              });
+        })
+        it('should verify the intent of the subscriber when the publisher has accepted the subscription', function() {
+          assert(verification);
+        });
+        it('should include the hub.mode', function() {
+          assert.equal(verification.query['hub.mode'], "subscribe");
+        });
+        it('should include the hub.topic', function() {
+          assert.equal(verification.query['hub.topic'], resource.links.self);
+        });
+        it('should include a hub.challenge', function() {
+          assert(verification.query['hub.challenge']);
+        });
+        it('should include the hub.lease_seconds', function() {
+          assert.equal(parseInt(verification.query['hub.lease_seconds']).toString(), verification.query['hub.lease_seconds']);
+        });
+      });
+    });
+  });
 
   describe('content distribution', function() {
 
