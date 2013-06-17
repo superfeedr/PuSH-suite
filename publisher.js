@@ -38,7 +38,7 @@ app.get('/resource', function(req, res){
 });
 
 app.post('/validate', function(req, res) {
-  if(req.body && req.body['hub.topic'] && req.body['hub.topic'].match(/denied$/))
+  if(req.body && req.body['hub.callback'] && req.body['hub.callback'].match(/denied$/))
     return res.send(401)
   return res.send(204)
 });
