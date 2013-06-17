@@ -2,25 +2,19 @@
 
 Use this to test a server for compliance with the [PubSubHubbub spec](https://superfeedr-misc.s3.amazonaws.com/pubsubhubbub-core-0.4.html) at version 0.4.
 
-**NOTE**: currently very unfinished
 
 
 ## Example usage
 
-    HUB_URL=http://pubsubhubbub.superfeedr.com CB_URL=http://testsuite.lvh.me ./node_modules/.bin/mocha
+    export HUB_URL=http://pubsubhubbub.superfeedr.com; mocha test.js
 
-This will run the test server. Note that this won't actually work unless the server behind HUB_URL can access CB_URL, which in this case is unlikely (unless you are Julien).
+This will run the test server. Note that this won't actually work unless the server behind HUB_URL can access this test server. In other words: do not run this on your local machine, unless it's visible from the web.
 
 ## Details
 
 To use this test suite, you need to provide two URLS via the runtime environment:
 
 - **HUB_URL**: this URL of the hub which will be tested for compliance with the PubSubHubbub spec
-- **CB_URL**: this is the callback URL through which the hub will communicate with this test suite
-
-You may also provide a **PORT** on which to bind, otherwise 8000 will be used as a default. (This test suite will bind to this port on all interfaces while it is active.)
-
-Make sure your callback URL will indeed allow the hub to connect to the listening test suite, i.e. simply providing `CB_URL=http://localhost:8000` will only work if the hub's "localhost" is the same as the test suite's. To test a public hub, you will need to expose this test suite publicly, by e.g. deploying it to "production".
 
 ## An aside
 
@@ -46,12 +40,12 @@ Then `sudo service nginx reload`.
 
     ssh -R 8455:localhost:8000 user@testsuite.example.com -N        # blocks shell, add `-f` to run in background
 
-3\. There is no step three! Actually there is: run the testsuite with `CB_URL=http://testsuite.example.com`
+3\. There is no step three! Actually there is: run the testsuite
 
 
 ## License (MIT)
 
-Copyright (c) 2013 Nathan Vander Wilt
+Copyright (c) 2013 Nathan Vander Wilt, Julien Genestoux, Superfeedr
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
