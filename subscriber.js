@@ -9,7 +9,7 @@ app.use(express.methodOverride());
 app.use(express.errorHandler());
 
 app.get('/callback', function(req, res) {
-  var self = req.protocol + "://" + req.get('host') + req.originalUrl;
+  var self = req.protocol + "://" + subscriber.hostname + req.originalUrl;
   res.setHeader('Link' , '<' + self + '>; rel="self";');
   if(req.query && req.query['hub.mode'] == "denied") {
     subscriber.denied(req);
@@ -31,6 +31,7 @@ app.post('/callback', function(req, res) {
 
 var subscriber = http.createServer(app);
 
+subscriber.hostname = '0.0.0.0:3002';
 
 subscriber.notified = function (req, res) {
   // This should ve overriden by the tests!

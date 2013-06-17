@@ -11,8 +11,8 @@ app.use(express.methodOverride());
 app.use(express.errorHandler());
 
 app.get('/resource', function(req, res){
-  publisher.self = req.protocol + "://" + req.get('host') + req.originalUrl;
-  var callback = req.protocol + "://" + req.get('host') + '/validate'
+  publisher.self = req.protocol + "://" + publisher.hostname + req.originalUrl;
+  var callback = req.protocol + "://" + publisher.hostname + '/validate'
   res.setHeader('Link' , [
                 '<' + publisher.self + '>; rel="self";',
                 '<' + publisher.hub + '>; rel="hub";',
@@ -48,6 +48,8 @@ var publisher = http.createServer(app);
 
 publisher.hub = 'http://pubsubhubbub.superfeedr.com'; // default
 publisher.self = null;
+
+publisher.hostname = '0.0.0.0:3001';
 
 publisher.publish = function(cb) {
   // First, add a new entry to the list.

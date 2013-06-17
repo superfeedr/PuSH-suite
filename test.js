@@ -8,6 +8,7 @@ subscriber = require('./subscriber.js');
 
 // https://superfeedr-misc.s3.amazonaws.com/pubsubhubbub-core-0.4.html
 
+var longTimeout = 1000000;
 var hostname =  process.env.HOSTNAME || '0.0.0.0';
 
 if(! process.env.HUB_URL) {
@@ -16,13 +17,17 @@ if(! process.env.HUB_URL) {
 }
 
 publisher.hub =  process.env.HUB_URL
+publisher.port = 3001;
+subscriber.port = 3002
+publisher.hostname = [hostname, publisher.port].join(':');
+subscriber.hostname = [hostname, subscriber.port].join(':');
 
 describe('PubSubHubbub', function () {
 
   before(function(done) {
     var ready = _.after(2, done);
-    publisher.listen(3001, hostname, ready);
-    subscriber.listen(3002, hostname, ready);
+    publisher.listen(publisher.port, ready);
+    subscriber.listen(subscriber.port, ready);
   });
 
   describe('discovery', function() {
@@ -219,7 +224,7 @@ describe('PubSubHubbub', function () {
 
     describe('subscription validation', function() {
       it('should inform the subscriber when the subscription has been denied by the publisher', function(done) {
-        this.timeout(10000);
+        this.timeout(longTimeout);
         request(publisher).get('/resource?' + 'hub=' + publisher.hub + '&publisher=denied').expect(200, function(err, res) {
           var resource = res.links.self;
           subscriber.denied = function(request) {
@@ -242,7 +247,7 @@ describe('PubSubHubbub', function () {
       });
 
       it('should inform the subscriber when the subscription has been denied by the publisher with the right hub.topic', function(done) {
-        this.timeout(10000);
+        this.timeout(longTimeout);
         request(publisher).get('/resource?' + 'hub=' + publisher.hub + '&publisher=denied').expect(200, function(err, res) {
           var resource = res.links.self;
           subscriber.denied = function(request) {
@@ -270,7 +275,7 @@ describe('PubSubHubbub', function () {
         var verification, resource;
 
         before(function(done) {
-          this.timeout(10000);
+          this.timeout(longTimeout);
           request(publisher).get('/resource?' + 'hub=' + publisher.hub + '&publisher=accepted').expect(200, function(err, res) {
             resource = res.links.self;
             subscriber.verified = function(request) {
