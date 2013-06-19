@@ -60,7 +60,7 @@ describe('PubSubHubbub', function () {
           done();
         });
       });
-    })
+    });
 
     it('should return a 202 when issuing a valid subscription request', function(done) {
       request(publisher.hub).
@@ -104,13 +104,14 @@ describe('PubSubHubbub', function () {
 
     it('should accept only the self link provided by the discovery phase, if there is any', function(done) {
       var parsed = urlParser.parse(resource.links.self);
-      parsed.hash = 'hello'
-      var r = urlParser.format(parsed);
+      parsed.search = '?somextra';
+      delete parsed.href;
+      delete parsed.path;
       request(publisher.hub).
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.topic=' + r).
+      send('hub.topic=' + urlParser.format(parsed)).
       send('hub.callback=' + callback.links.self).
       expect(422, done);
     });

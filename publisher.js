@@ -11,7 +11,7 @@ app.use(express.methodOverride());
 app.use(express.errorHandler());
 
 app.get('/resource', function(req, res){
-  publisher.self = req.protocol + "://" + publisher.hostname + req.originalUrl;
+  publisher.self = req.protocol + "://" + publisher.hostname + '/resource';
   var callback = req.protocol + "://" + publisher.hostname + '/validate'
   res.setHeader('Link' , [
                 '<' + publisher.self + '>; rel="self";',
