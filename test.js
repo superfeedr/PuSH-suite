@@ -62,6 +62,18 @@ describe('PubSubHubbub', function () {
       });
     });
 
+    after(function(done) {
+      subscriber.verified = function(request) {
+      };
+      request(publisher.hub).
+      post('/').
+      type('form').
+      send('hub.mode=unsubscribe').
+      send('hub.topic=' + resource.links.self).
+      send('hub.callback=' + callback.links.self).
+      end(done);
+    });
+
     it('should return a 202 when issuing a valid subscription request', function(done) {
       request(publisher.hub).
       post('/').
@@ -99,7 +111,15 @@ describe('PubSubHubbub', function () {
       send('hub.mode=subscribe').
       send('hub.topic=' + resource.links.self).
       send('hub.callback=' + callback.links.self + '?param=extra').
-      expect(202, done);
+      expect(202, function() {
+        request(publisher.hub).
+        post('/').
+        type('form').
+        send('hub.mode=unsubscribe').
+        send('hub.topic=' + resource.links.self).
+        send('hub.callback=' + callback.links.self + '?param=extra').
+        expect(202, done);
+      });
     });
 
     it('should accept only the self link provided by the discovery phase, if there is any', function(done) {
@@ -242,8 +262,7 @@ describe('PubSubHubbub', function () {
 
     describe('when the subscription has been validated, verified and accepted', function() {
 
-      var resource;
-
+      var resource, callback;
       before(function(done) {
         this.timeout(longTimeout);
         request(publisher).get('/resource').expect(200, function(err, res) {
@@ -252,7 +271,7 @@ describe('PubSubHubbub', function () {
             done();
           }
           request(subscriber).get('/callback').expect(200, function(err, res) {
-            var callback = res.links.self;
+            callback = res.links.self;
             request(publisher.hub).
             post('/').
             type('form').
@@ -262,6 +281,18 @@ describe('PubSubHubbub', function () {
             expect(202, function(err, res) {});
           });
         });
+      });
+
+      after(function(done) {
+        subscriber.verified = function(request) {
+        };
+        request(publisher.hub).
+        post('/').
+        type('form').
+        send('hub.mode=unsubscribe').
+        send('hub.topic=' + encodeURIComponent(resource.links.self)).
+        send('hub.callback=' + encodeURIComponent(callback)).
+        end(done);
       });
 
       describe('when the subscriber serves a 2XX response code', function() {
