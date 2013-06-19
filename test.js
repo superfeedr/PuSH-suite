@@ -1,4 +1,5 @@
 var urlParser = require('url');
+var queryStringParser = require('querystring');
 var request = require('supertest'),
 assert = require('assert'),
 _ = require('underscore');
@@ -55,7 +56,10 @@ describe('PubSubHubbub', function () {
     before(function(done) {
       request(publisher).get('/resource?hub=' + publisher.hub).expect(200, function(err, res) {
         resource = res;
-        request(subscriber).get('/callback').expect(200, function(err, res) {
+        // We use an wontconfirm param so that the subscribe won't actually confirm subscriptions
+        // in order to test only what's necessary. Also this makes things much easier to handle
+        // for garbase cleaning
+        request(subscriber).get('/callback?wontconfirm=true').expect(200, function(err, res) {
           callback = res
           done();
         });
@@ -69,8 +73,8 @@ describe('PubSubHubbub', function () {
       post('/').
       type('form').
       send('hub.mode=unsubscribe').
-      send('hub.topic=' + resource.links.self).
-      send('hub.callback=' + callback.links.self).
+      send('hub.topic=' + encodeURIComponent(resource.links.self)).
+      send('hub.callback=' + encodeURIComponent(callback.links.self)).
       end(done);
     });
 
@@ -79,8 +83,8 @@ describe('PubSubHubbub', function () {
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.topic=' + resource.links.self).
-      send('hub.callback=' + callback.links.self).
+      send('hub.topic=' + encodeURIComponent(resource.links.self)).
+      send('hub.callback=' + encodeURIComponent(callback.links.self)).
       expect(202, done);
     });
 
@@ -89,8 +93,8 @@ describe('PubSubHubbub', function () {
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.topic=' + resource.links.self).
-      send('hub.callback=' + callback.links.self).
+      send('hub.topic=' + encodeURIComponent(resource.links.self)).
+      send('hub.callback=' + encodeURIComponent(callback.links.self)).
       expect(202, done);
     });
 
@@ -99,27 +103,26 @@ describe('PubSubHubbub', function () {
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.topic=' + resource.links.self).
-      send('hub.callback=' + callback.links.self.replace('http', 'https')).
+      send('hub.topic=' + encodeURIComponent(resource.links.self)).
+      send('hub.callback=' + encodeURIComponent(callback.links.self.replace('http', 'https'))).
       expect(202, done);
     });
 
     it('should accept callback urls with extra string parameters', function(done) {
+      var parsed = urlParser.parse(callback.links.self);
+      var qs = queryStringParser.parse(parsed.query)
+      qs['extra'] = 'more';
+      parsed.query = qs;
+      delete parsed.href;
+      delete parsed.search;
+      delete parsed.path;
       request(publisher.hub).
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.topic=' + resource.links.self).
-      send('hub.callback=' + callback.links.self + '?param=extra').
-      expect(202, function() {
-        request(publisher.hub).
-        post('/').
-        type('form').
-        send('hub.mode=unsubscribe').
-        send('hub.topic=' + resource.links.self).
-        send('hub.callback=' + callback.links.self + '?param=extra').
-        expect(202, done);
-      });
+      send('hub.topic=' + encodeURIComponent(resource.links.self)).
+      send('hub.callback='  + encodeURIComponent(urlParser.format(parsed))).
+      expect(202, done);
     });
 
     it('should accept only the self link provided by the discovery phase, if there is any', function(done) {
@@ -131,8 +134,8 @@ describe('PubSubHubbub', function () {
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.topic=' + urlParser.format(parsed)).
-      send('hub.callback=' + callback.links.self).
+      send('hub.topic=' + encodeURIComponent(urlParser.format(parsed))).
+      send('hub.callback=' + encodeURIComponent(callback.links.self)).
       expect(422, done);
     });
 
@@ -141,7 +144,7 @@ describe('PubSubHubbub', function () {
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.topic=' + resource.links.self).
+      send('hub.topic=' + encodeURIComponent(resource.links.self)).
       expect(422, /hub\.callback/, done);
     });
 
@@ -149,8 +152,8 @@ describe('PubSubHubbub', function () {
       request(publisher.hub).
       post('/').
       type('form').
-      send('hub.topic=' + resource.links.self).
-      send('hub.callback=' + callback.links.self).
+      send('hub.topic=' + encodeURIComponent(resource.links.self)).
+      send('hub.callback=' + encodeURIComponent(callback.links.self)).
       expect(422, /hub\.mode/, done);
     });
 
@@ -159,7 +162,7 @@ describe('PubSubHubbub', function () {
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.callback=' + callback.links.self).
+      send('hub.callback=' + encodeURIComponent(callback.links.self)).
       expect(422, /hub\.topic/, done);
     });
 
@@ -168,8 +171,8 @@ describe('PubSubHubbub', function () {
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.topic=' + resource.links.self).
-      send('hub.callback=' + callback.links.self).
+      send('hub.topic=' + encodeURIComponent(resource.links.self)).
+      send('hub.callback=' + encodeURIComponent(callback.links.self)).
       send('another=param').
       expect(202, done);
     });
@@ -179,15 +182,15 @@ describe('PubSubHubbub', function () {
       post('/').
       type('form').
       send('hub.mode=subscribe').
-      send('hub.topic=' + resource.links.self).
-      send('hub.callback=' + callback.links.self).
+      send('hub.topic=' + encodeURIComponent(resource.links.self)).
+      send('hub.callback=' + encodeURIComponent(callback.links.self)).
       expect(202, function() {
         request(publisher.hub).
         post('/').
         type('form').
         send('hub.mode=subscribe').
-        send('hub.topic=' + resource.links.self).
-        send('hub.callback=' + callback.links.self).
+        send('hub.topic=' + encodeURIComponent(resource.links.self)).
+        send('hub.callback=' + encodeURIComponent(callback.links.self)).
         expect(202, done);
       });
     });
@@ -205,12 +208,10 @@ describe('PubSubHubbub', function () {
         type('form').
         send('hub.mode=subscribe').
         send('hub.topic=' + encodeURIComponent(resource.links.self)).
-        send('hub.callback=' + encodeURIComponent(callback.links.self + '?publisher=denied')).
+        send('hub.callback=' + encodeURIComponent(callback.links.self + '&publisher=denied')).
         expect(202, function(err, res) {
-
         });
-
-      })
+      });
       it('should inform the subscriber when the subscription has been denied by the publisher', function() {
         assert.equal(denied.query['hub.mode'], "denied");
       });

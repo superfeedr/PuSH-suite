@@ -16,8 +16,14 @@ app.get('/callback', function(req, res) {
     res.send(200, 'DAMMIT');
   }
   else if(req.query && (req.query['hub.mode'] == "subscribe" || req.query['hub.mode'] == "unsubscribe")) {
-    subscriber.verified(req);
-    res.send(200, req.query['hub.challenge']);
+    if(req.query['wontconfirm']) {
+      subscriber.verified(req);
+      res.send(404);
+    }
+    else {
+      subscriber.verified(req);
+      res.send(200, req.query['hub.challenge']);
+    }
   }
   else {
     res.send(200, 'WHAT?');
