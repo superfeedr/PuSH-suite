@@ -2,21 +2,22 @@
 
 Use this to test a server for compliance with the [PubSubHubbub spec](https://superfeedr-misc.s3.amazonaws.com/pubsubhubbub-core-0.4.html) at version 0.4.
 
-
-
 ## Example usage
 
-    export HUB_URL=http://pubsubhubbub.superfeedr.com; mocha test.js
+    export HOSTNAME=50.116.18.249; export HUB_URL=http://pubsubhubbub.superfeedr.com; mocha test.js  --reporter spec
 
-This will run the test server. Note that this won't actually work unless the server behind HUB_URL can access this test server. In other words: do not run this on your local machine, unless it's visible from the web.
+The `hostname` part is important because it is used to build urls for the publisher and subscriber stubs.
+The `HUB_URL` is obviously the hub you want to test.
 
-## Details
+Note that this won't actually work unless the server behind HUB_URL can access this test server. In other words: do not run this on your local machine, unless it's visible from the web. Also, given the very nature of PubSubHubbub's asynchronous property, testing is quite difficult. For example, Superfeedr will ignore pings on very recently added feeds (spam filtering mechanism).
 
-To use this test suite, you need to provide two URLS via the runtime environment:
+## Todo
 
-- **HUB_URL**: this URL of the hub which will be tested for compliance with the PubSubHubbub spec
+One of the key goals of this test suite is to allow people to run it from a web browser with results served directly from the testing server.
 
-## An aside
+Adding test suites for the subscriber and publisher behaviors too.
+
+## SSH Tunneling
 
 To speed up development, I'm actually tunneling traffic from a public server of mine to my local machine.
 
