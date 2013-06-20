@@ -11,8 +11,7 @@
     "request": "~2.21.0",
     "ltx": "~0.2.3",
     "sockjs": "*",
-    "node-static": "*",
-    "underscore"
+    "node-static": "*"
   },
   "devDependencies": {},
   "scripts": {
