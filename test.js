@@ -7,7 +7,6 @@ _ = require('underscore');
 var publisher = require('./publisher.js'),
     subscriber = require('./subscriber.js');
 
-// https://superfeedr-misc.s3.amazonaws.com/pubsubhubbub-core-0.4.html
 
 var longTimeout = 100000;
 var hostname =  process.env.HOSTNAME || '0.0.0.0';

@@ -22,15 +22,12 @@ sockServer.on('connection', function(conn) {
       proc.stdout.on('data', send);
       proc.stderr.on('data', send);
       proc.on('close', function() {
-        console.log('proc finished, deleting it')
         delete proc;
       })
     }
   });
   conn.on('close', function() {
-    console.log('connection closed');
     if(proc) {
-      console.log('Killing proc');
       proc.kill("SIGINT");
     }
   })
