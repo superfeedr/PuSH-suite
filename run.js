@@ -16,7 +16,9 @@ sockServer.on('connection', function(conn) {
   }
   conn.on('data', function(message) {
     if(message) {
-      proc = spawn('/usr/local/bin/node', testArgs, {env: {'HUB_URL': message}});
+      var env = process.env;
+      env['HUB_URL'] = message;
+      proc = spawn('/usr/local/bin/node', testArgs, {env: env});
       proc.stdout.on('data', send);
       proc.stderr.on('data', send);
       proc.on('close', function() {
@@ -48,6 +50,5 @@ server.addListener('upgrade', function(req,res){
 
 sockServer.installHandlers(server, {prefix:'/test-stream'});
 
-console.log(' [*] Listening on 0.0.0.0:9999' );
-server.listen(9999, '0.0.0.0');
+server.listen(9999);
 
