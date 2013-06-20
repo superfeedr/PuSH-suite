@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en" ng-app>
+  <head>
+    <meta charset="utf-8">
+    <title>PubSubHubbub, compliance test suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="./css/bootstrap.css" rel="stylesheet">
+    <link href="./css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
+
+    <script type="text/javascript">
+    function TestController($scope){
+      $scope.lines=[];
+      $scope.url = 'http://pubsubhubbub.superfeedr.com'; // Default
+      $scope.result = false;
+      $scope.runTests=function(){
+        $scope.running = "disabled";
+        $scope.lines = [];
+        $scope.result = false;
+        sockjs.onmessage = function(e) {
+          if(e.data) {
+            var m = JSON.parse(e.data);
+            var line = m[1];
+            console.log(m[0])
+            switch(m[0]) {
+              case 'pass':
+                line.type='success';
+                break;
+              case 'fail':
+                line.type='error'
+                break;
+              case 'start':
+                break;
+              case 'end':
+                $scope.running = "";
+                break;
+              default:
+              line.type = m[0];
+            }
+
+            if(line.type == 'end') {
+              $scope.result = line
+            }
+            $scope.$apply(function(){ $scope.lines.push(line); })
+          }
+        };
+        sockjs.onclose   = function()  {console.log('[*] close');};
+        sockjs.send($scope.url);
+      }
+      var sockjs_url = '/test-stream';
+      var sockjs = new SockJS(sockjs_url);
+    }
+    </script>
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">PubSubHubbub Compliance Test suite</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="https://superfeedr-misc.s3.amazonaws.com/pubsubhubbub-core-0.4.html">Spec</a></li>
+              <li><a href="https://github.com/superfeedr/PuSH-suite">Code</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container" style="margin-top:60px">
+      <div ng-controller="TestController">
+        <p>
+          This is a compliance test suite for PubSubHubbub hubs support version 0.4 of the specification. Type the url of the hub you want to test below.
+        </p>
+        <form class="form-inline" ng-submit="runTests()">
+          <input ng-class="running" ng-model="url"  type="text" class="input-xxlarge" placeholder="Url of Hub to test">
+          <button ng-class="running" class="btn">Run suite</button>
+        </form>
+        <p ng-show="result">
+          {{result.suites}} suites, {{result.tests}} tests, {{result.passes}} passes, {{result.failures}} failures, {{result.pending}} pending.
+        </p>
+        <table class="table table-bordered">
+          <tr ng-repeat="line in lines" class="{{line.type}}">
+            <td>{{line.fullTitle}}</td>
+            <td>{{line.duration || 0}}ms</td>
+          </tr>
+        </table>
+        <p class="alert alert-info">
+          This test suite can only run once at a time as both stubs for the publisher and the subscriber need to be the <strong>only listeners on TCP ports</strong>. If you see a <em>PubSubHubbub "before all" hook</em> error, it's probably that someone else is already running the test suite.
+        </p>
+        </div>
+      </div> <!-- /container -->
+  </body>
+</html>
+

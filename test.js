@@ -5,11 +5,11 @@ assert = require('assert'),
 _ = require('underscore');
 
 var publisher = require('./publisher.js'),
-subscriber = require('./subscriber.js');
+    subscriber = require('./subscriber.js');
 
 // https://superfeedr-misc.s3.amazonaws.com/pubsubhubbub-core-0.4.html
 
-var longTimeout = 1000000;
+var longTimeout = 100000;
 var hostname =  process.env.HOSTNAME || '0.0.0.0';
 
 if(! process.env.HUB_URL) {
@@ -24,8 +24,7 @@ publisher.hostname = [hostname, publisher.port].join(':');
 subscriber.hostname = [hostname, subscriber.port].join(':');
 
 describe('PubSubHubbub', function () {
-
-  before(function(done) {
+  before(function(done, err) {
     var ready = _.after(2, done);
     publisher.listen(publisher.port, ready);
     subscriber.listen(subscriber.port, ready);
