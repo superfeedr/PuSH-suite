@@ -4,7 +4,11 @@ Use this to test a server for compliance with the [PubSubHubbub spec](https://su
 
 ## Example usage
 
-    export HOSTNAME=50.116.18.249; export HUB_URL=http://pubsubhubbub.superfeedr.com; mocha test.js  --reporter spec
+Once you've checked out the repo, make sure you install the node modules (you need to have [node.js](http://nodejs.org/) installed):
+  
+    $ npm install
+
+    $ export HOSTNAME=50.116.18.249; export HUB_URL=http://pubsubhubbub.superfeedr.com; mocha test.js  --reporter spec
 
 The `hostname` part is important because it is used to build urls for the publisher and subscriber stubs.
 The `HUB_URL` is obviously the hub you want to test.
